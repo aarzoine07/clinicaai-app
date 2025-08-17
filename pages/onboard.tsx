@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
 
+/** Dark theme tuned to match /signup */
 const THEME = {
   bg: "#0c1420",
   glowBlue: "rgba(72, 134, 255, 0.18)",
@@ -30,7 +31,7 @@ type Payload = {
   clinicName: string;
   websiteUrl: string;
   googleBusinessUrl: string;
-  // we’ll add more fields step-by-step (services, hours, routing, languages, etc.)
+  servicesHours: string;
   acceptedTerms: boolean;
   caslOptIn: boolean;
 };
@@ -42,13 +43,15 @@ export default function Onboard() {
     msg: "",
   });
 
+  // Refs
   const clinicRef = useRef<HTMLInputElement | null>(null);
   const websiteRef = useRef<HTMLInputElement | null>(null);
   const gmbRef = useRef<HTMLInputElement | null>(null);
+  const servicesRef = useRef<HTMLTextAreaElement | null>(null);
   const termsRef = useRef<HTMLInputElement | null>(null);
   const caslRef = useRef<HTMLInputElement | null>(null);
 
-  // Prefill from query (?clinic=?, ?website=?, ?gmb=?)
+  // Prefill from URL (?clinic=&website=&gmb=)
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
     const c = sp.get("clinic") || "";
@@ -59,6 +62,12 @@ export default function Onboard() {
     if (gmbRef.current && g) gmbRef.current.value = g;
   }, []);
 
+  const focusInvalid = (el?: { focus: () => void } | null) => {
+    try {
+      el?.focus();
+    } catch {}
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus({ kind: "idle", msg: "" });
@@ -66,33 +75,35 @@ export default function Onboard() {
     const clinicName = clinicRef.current?.value.trim() || "";
     const websiteUrl = websiteRef.current?.value.trim() || "";
     const googleBusinessUrl = gmbRef.current?.value.trim() || "";
+    const servicesHours = servicesRef.current?.value.trim() || "";
+    const acceptedTerms = !!termsRef.current?.checked;
+    const caslOptIn = !!caslRef.current?.checked;
 
+    // Basic validations
     if (!clinicName) {
       setStatus({ kind: "err", msg: "Please provide the clinic name. / Veuillez indiquer le nom de la clinique." });
-      clinicRef.current?.focus();
-      return;
+      return focusInvalid(clinicRef.current);
     }
     if (!websiteUrl) {
       setStatus({ kind: "err", msg: "Please provide the website URL. / Veuillez indiquer l’URL du site web." });
-      websiteRef.current?.focus();
-      return;
+      return focusInvalid(websiteRef.current);
     }
-    if (!termsRef.current?.checked) {
+    if (!acceptedTerms) {
       setStatus({
         kind: "err",
         msg:
           "Please accept the Terms & Privacy to continue. / Veuillez accepter les Conditions et la Politique pour continuer.",
       });
-      termsRef.current?.focus();
-      return;
+      return focusInvalid(termsRef.current);
     }
 
     const payload: Payload = {
       clinicName,
       websiteUrl,
       googleBusinessUrl,
-      acceptedTerms: !!termsRef.current?.checked,
-      caslOptIn: !!caslRef.current?.checked,
+      servicesHours,
+      acceptedTerms,
+      caslOptIn,
     };
 
     setLoading(true);
@@ -115,9 +126,7 @@ export default function Onboard() {
     } catch (err: any) {
       setStatus({
         kind: "err",
-        msg:
-          err?.message ||
-          "Unexpected error. Try again. / Erreur inattendue. Réessayez.",
+        msg: err?.message || "Unexpected error. Try again. / Erreur inattendue. Réessayez.",
       });
     } finally {
       setLoading(false);
@@ -137,6 +146,8 @@ export default function Onboard() {
     transition: "border-color 140ms ease",
   };
 
+  const small = { color: THEME.placeholder, fontSize: 12 } as const;
+
   return (
     <main className={inter.className} style={{ minHeight: "100vh", width: "100%", background: THEME.bg }}>
       <Head>
@@ -149,7 +160,7 @@ export default function Onboard() {
         `}</style>
       </Head>
 
-      {/* background glow */}
+      {/* Background glows */}
       <div
         aria-hidden
         style={{
@@ -244,8 +255,33 @@ export default function Onboard() {
                 onFocus={(e) => (e.currentTarget.style.borderColor = THEME.inputFocus)}
                 onBlur={(e) => (e.currentTarget.style.borderColor = THEME.inputBorder)}
               />
-              <div style={{ color: THEME.placeholder, fontSize: 12, marginTop: 6 }}>
+              <div style={{ ...small, marginTop: 6 }}>
                 Optional but recommended / Facultatif mais recommandé.
+              </div>
+            </div>
+
+            {/* Services & Hours */}
+            <div style={{ marginTop: 16 }}>
+              <label htmlFor="servicesHours" style={{ color: THEME.body, fontSize: 12 }}>
+                Services & Hours / Services et heures
+              </label>
+              <textarea
+                id="servicesHours"
+                ref={servicesRef}
+                rows={5}
+                placeholder={`Example:\nTeeth cleaning — Mon–Fri 9am–5pm\nDental implants — Tue/Thu 10am–6pm\n\nExemple:\nNettoyage — Lun–Ven 9h–17h\nImplants — Mar/Jeu 10h–18h`}
+                style={{
+                  ...inputStyle,
+                  fontSize: 15,
+                  resize: "vertical",
+                  lineHeight: 1.4,
+                }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = THEME.inputFocus)}
+                onBlur={(e) => (e.currentTarget.style.borderColor = THEME.inputBorder)}
+              />
+              <div style={{ ...small, marginTop: 6 }}>
+                Add services and opening hours so your AI can answer patients. /
+                Ajoutez vos services et horaires pour que l’IA puisse répondre aux patients.
               </div>
             </div>
 
