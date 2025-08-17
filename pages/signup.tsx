@@ -3,15 +3,29 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
 
+const THEME = {
+  bg: "#0c1420",
+  inputBg: "#141e2c",
+  inputBorder: "#283445",
+  inputFocus: "#4c6fff",
+  btnBg: "#2a3342",
+  btnBorder: "#3a465a",
+  btnHover: "#334056",
+  heading: "#ffffff",
+  body: "#c9d1d9",
+  placeholder: "#9aa8b5",
+  maxWidth: 800,
+};
+
 const SignupPage: NextPage = () => {
   const [email, setEmail] = useState("");
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // dummy for now — API call comes next
+    e.preventDefault(); // API call comes next step
   };
 
   return (
-    <main className="min-h-screen w-full bg-[#0c1420]">
+    <main style={{ minHeight: "100vh", width: "100%", background: THEME.bg }}>
       <Head>
         <title>Sign up • ClinicaAI</title>
         <meta
@@ -20,30 +34,40 @@ const SignupPage: NextPage = () => {
         />
       </Head>
 
-      <div className="mx-auto w-full px-6 sm:px-8" style={{ maxWidth: 800 }}>
-        <section className="pt-24 sm:pt-28 md:pt-32">
-          <h1 className="text-white text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight tracking-tight">
+      <div style={{ margin: "0 auto", width: "100%", padding: "0 24px", maxWidth: THEME.maxWidth }}>
+        <section style={{ paddingTop: 96 }}>
+          {/* Headline EN */}
+          <h1
+            style={{
+              color: THEME.heading,
+              fontSize: 40,
+              lineHeight: 1.15,
+              fontWeight: 600,
+              letterSpacing: -0.5,
+              margin: 0,
+            }}
+          >
             Create your
             <br />
             ClinicaAI account
           </h1>
-          <h2 className="sr-only">Créer votre compte ClinicaAI</h2>
+          {/* Headline FR-CA (visually hidden but present for semantics) */}
+          <h2 style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}>
+            Créer votre compte ClinicaAI
+          </h2>
 
-          <p className="mt-3 text-sm sm:text-base text-[#c9d1d9] max-w-prose">
+          {/* Subcopy EN */}
+          <p style={{ marginTop: 12, color: THEME.body, fontSize: 16, maxWidth: 640 }}>
             Enter your email to receive a one-time magic link. No password required.
           </p>
-          <p className="mt-1 text-xs sm:text-sm text-[#c9d1d9]/80 max-w-prose">
+          {/* Subcopy FR-CA */}
+          <p style={{ marginTop: 6, color: `${THEME.body}CC`, fontSize: 14, maxWidth: 640 }}>
             Entrez votre courriel pour recevoir un lien magique à usage unique. Aucun mot de passe requis.
           </p>
 
-          <form
-            onSubmit={onSubmit}
-            noValidate
-            className="mt-8 max-w-xl"
-            aria-describedby="signup-help"
-          >
-            <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-sm text-[#c9d1d9]">
+          <form onSubmit={onSubmit} noValidate aria-describedby="signup-help" style={{ marginTop: 32, maxWidth: 640 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <label htmlFor="email" style={{ color: THEME.body, fontSize: 14 }}>
                 Email address / Adresse courriel
               </label>
 
@@ -57,44 +81,61 @@ const SignupPage: NextPage = () => {
                 placeholder="you@clinic.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 text-base outline-none transition-colors
-                           bg-[#141e2c] text-white placeholder-[#9aa8b5] border border-[#283445]
-                           focus:border-[#4c6fff] focus-visible:ring-2 focus-visible:ring-[#4c6fff]/60"
                 aria-required="true"
+                style={{
+                  width: "100%",
+                  borderRadius: 12,
+                  padding: "12px 16px",
+                  fontSize: 16,
+                  outline: "none",
+                  background: THEME.inputBg,
+                  color: THEME.heading,
+                  border: `1px solid ${THEME.inputBorder}`,
+                }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = THEME.inputFocus)}
+                onBlur={(e) => (e.currentTarget.style.borderColor = THEME.inputBorder)}
               />
 
-              <div id="signup-help" className="text-xs text-[#9aa8b5]">
+              <div id="signup-help" style={{ color: THEME.placeholder, fontSize: 12 }}>
                 Use your clinic/work email if possible. / Idéalement, utilisez le courriel de la clinique.
               </div>
             </div>
 
-            <div className="mt-4">
+            <div style={{ marginTop: 16 }}>
               <button
                 type="submit"
-                className="inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-medium
-                           transition-colors text-white
-                           bg-[#2a3342] border border-[#3a465a]
-                           hover:bg-[#334056] focus-visible:ring-2 focus-visible:ring-[#4c6fff]/60"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 12,
+                  padding: "12px 16px",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: "#fff",
+                  background: THEME.btnBg,
+                  border: `1px solid ${THEME.btnBorder}`,
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = THEME.btnHover)}
+                onMouseLeave={(e) => (e.currentTarget.style.background = THEME.btnBg)}
               >
                 Send magic link
               </button>
-              <div className="sr-only">Envoyer le lien magique</div>
+              <div style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}>
+                Envoyer le lien magique
+              </div>
             </div>
 
-            <div
-              id="signup-status"
-              role="status"
-              aria-live="polite"
-              className="mt-3 min-h-[1.25rem] text-sm text-[#c9d1d9]"
-            />
-            <div className="mt-10">
-              <a
-                href="/"
-                className="text-xs underline-offset-4 hover:underline text-[#c9d1d9]"
-              >
+            <div id="signup-status" role="status" aria-live="polite" style={{ marginTop: 12, minHeight: 20, color: THEME.body, fontSize: 14 }} />
+
+            <div style={{ marginTop: 40 }}>
+              <a href="/" style={{ color: THEME.body, fontSize: 12, textDecoration: "underline", textUnderlineOffset: 4 }}>
                 Back to home →
               </a>
-              <span className="sr-only">Retour à l’accueil</span>
+              <span style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", border: 0 }}>
+                Retour à l’accueil
+              </span>
             </div>
           </form>
         </section>
